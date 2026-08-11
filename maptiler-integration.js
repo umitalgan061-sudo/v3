@@ -6,6 +6,9 @@
  * API: https://maptiler.com/cloud/api/ (Ücretsiz tier: 10k req/ay)
  */
 
+if (!window.__tarimsalMapTilerIntegrationLoaded) {
+  window.__tarimsalMapTilerIntegrationLoaded = true;
+
 let mapTilerRadarActive = false;
 let mapTilerRadarLayer = null;
 
@@ -95,3 +98,4 @@ window.toggleMapTilerRadar = toggleMapTilerRadar;
 window.openMapTilerSettings = openMapTilerSettings;
 
 console.log('✅ MapTiler Weather API modülü yüklendi');
+}
