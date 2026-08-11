@@ -2,7 +2,7 @@
   "name": "Tarımsal CBS",
   "short_name": "Tarımsal CBS",
   "description": "Ankara Büyükşehir Belediyesi tarımsal CBS platformu — katman yönetimi, ada/parsel sorgulama, hava analizi, uydu ve toprak haritaları. Çiftçi ve teknikerlerin saha çalışmalarında kullanmak üzere tasarlanmış.",
-  "start_url": "./index.html",
+  "start_url": "./pwa-start.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
