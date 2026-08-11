@@ -7556,6 +7556,37 @@ if(isIOSDevice) {
   window.addEventListener('load', () => setTimeout(showInstallBanner, 2500));
 }
 
+// PWA_SHORTCUT_ROUTER_V1 — manifest.json içindeki ?view= kısayollarını
+// mevcut arayüz kontrollerine bağlar; yeni panel/işlev oluşturmaz.
+const pwaShortcutView = new URLSearchParams(window.location.search).get('view');
+if(['ilce', 'hava', 'parsel'].includes(pwaShortcutView)) {
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const ensureLeftDrawerVisible = () => {
+        const left = document.getElementById('left');
+        if(window.innerWidth <= 768 && left && !left.classList.contains('drawer-open')) {
+          toggleDrawer('left');
+        }
+      };
+
+      if(pwaShortcutView === 'ilce') {
+        ensureLeftDrawerVisible();
+        document.getElementById('ilce-select')?.focus();
+        return;
+      }
+      if(pwaShortcutView === 'parsel') {
+        ensureLeftDrawerVisible();
+        document.getElementById('ap-ada')?.focus();
+        return;
+      }
+
+      expandBottomPanel();
+      const hourlyTab = document.querySelector('#bottom .btab');
+      if(hourlyTab) showSaatlik(hourlyTab);
+    }, 0);
+  });
+}
+
 // ── ÇEVRİMDIŞI DESTEK KASITLI OLARAK KAPALI ─────────────────────────────
 // Site bilinçli olarak çevrimdışı çalışmıyor (canlı Sentinel/sınır verisinin
 // bayatlaması istenmiyor) — service worker artık register edilmiyor. Daha
@@ -7563,6 +7594,23 @@ if(isIOSDevice) {
 // varsa, bu ziyarette temizlenir ki eski istemcilerde de bayat veri kalmasın.
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    // PWA_SCOPE_GUARD_V1 — Tarımsal CBS yalnızca kendi service-worker scope'u
+    // ve kendi ad önekini taşıyan cache'leri temizlesin. Aynı origin altındaki
+    // başka uygulamaların kayıt/cache'lerine dokunulmaz.
+    const tarimsalAppScope = new URL('./', window.location.href).href;
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs
+        .filter(reg => reg.scope.startsWith(tarimsalAppScope))
+        .forEach(reg => reg.unregister());
+    });
+    if(window.caches) {
+      caches.keys().then(names => names
+        .filter(name => name.startsWith('tarimsal-cbs-'))
+        .forEach(name => caches.delete(name)));
+    }
+    // No-delete kuralı gereği eski genel temizlik satırları aşağıda korunuyor;
+    // bu erken dönüş onları çalıştırmayarak yalnızca güvenli scoped temizliği uygular.
+    return;
     navigator.serviceWorker.getRegistrations().then(regs => {
       regs.forEach(reg => reg.unregister());
     });
