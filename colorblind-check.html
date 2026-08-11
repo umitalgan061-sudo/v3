@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colorblind Erişilebilirlik Test</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+.test-section { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+h2 { color: #333; border-bottom: 2px solid #c0392b; padding-bottom: 10px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+.swatch { padding: 20px; border-radius: 6px; text-align: center; color: white; font-weight: bold; }
+.legend-item { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+.color-box { width: 30px; height: 30px; border-radius: 4px; }
+.note { background: #fffacd; padding: 10px; border-left: 4px solid #f39c12; margin-top: 10px; font-size: 12px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+th { background: #f0f0f0; }
+</style>
+</head>
+<body>
+<h1>🔍 TARIMSAL CBS – Colorblind Erişilebilirlik Testi</h1>
+
+<div class="test-section">
+<h2>1️⃣ Grid Tahmin Sıcaklık Renkleri (48H)</h2>
+<p>Sıcaklık değerlerine göre renkler — red-green colorblind (%8 erkek) için uyumlu mu?</p>
+<div class="grid">
+<div class="swatch" style="background: #9b59b6;">-10°C<br/>Mor</div>
+<div class="swatch" style="background: #3498db;">10°C<br/>Mavi</div>
+<div class="swatch" style="background: #2ecc71;">15°C<br/>Yeşil</div>
+<div class="swatch" style="background: #f1c40f;">20°C<br/>Sarı</div>
+<div class="swatch" style="background: #f39c12;">25°C<br/>Turuncu</div>
+<div class="swatch" style="background: #e74c3c;">30°C<br/>Kırmızı</div>
+</div>
+<div class="note">
+✅ <strong>Bulgu:</strong> Sekvans mor→mavi→yeşil→sarı→turuncu→kırmızı, luminosity artışı net. 
+Red-green colorblind: mor ≈ turuncu/kırmızı görülür; ama sarı-turuncu aralığı parlaklıkla ayrılıyor. 
+<strong>Tavsiye:</strong> Turuncu yerine açık-sarı veya camgöbeği ekleme; veya parlaklık kontrast +10%.
+</div>
+</div>
+
+<div class="test-section">
+<h2>2️⃣ Yağış Radaarı Tiles (OpenWeatherMap Renkleri)</h2>
+<p>Radar tiles (OpenWeatherMap'den) — tipik sıralaması: blue→cyan→green→yellow→red</p>
+<div class="grid">
+<div class="swatch" style="background: #0033ff;">0-0.5 mm<br/>Mavi</div>
+<div class="swatch" style="background: #00ccff;">0.5-2 mm<br/>Camgöbeği</div>
+<div class="swatch" style="background: #00ff00;">2-5 mm<br/>Yeşil</div>
+<div class="swatch" style="background: #ffff00; color: #333;">5-10 mm<br/>Sarı</div>
+<div class="swatch" style="background: #ff9900;">10-25 mm<br/>Turuncu</div>
+<div class="swatch" style="background: #cc0000;">25+ mm<br/>Kırmızı</div>
+</div>
+<div class="note">
+⚠️ <strong>Sorunu:</strong> Red-green colorblind insanlar yeşili kırmızı gibi görebilir → hafif yağış (2-5mm) ile şiddetli yağış (25+mm) ayrımı güçleşir.
+<strong>Çözüm:</strong> Overlay pattern (hatching): hafif yağış = nokta, orta = çizgi, şiddetli = diyagonal hatch. <strong>Uygulanmadı ama tavsiye edildi.</strong>
+</div>
+</div>
+
+<div class="test-section">
+<h2>3️⃣ CBS Katmanları (Tarla/Corine/Toprak)</h2>
+<table>
+<tr>
+<th>Katman</th>
+<th>Renk</th>
+<th>Colorblind Durum</th>
+<th>Tavsiye</th>
+</tr>
+<tr>
+<td>Tarla (İlliyetler)</td>
+<td style="background: #c0392b; color: white;">■ Kırmızı (#c0392b)</td>
+<td>✅ Başlık/sınır: kurumsal vurgu, luminosity net</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Corine Arazi</td>
+<td>Çoklu (yeşil-sarı-turuncu)</td>
+<td>⚠️ Yeşil-kırmızı uyuşmazlık riski (kategoriler arasında)</td>
+<td>Corine'ın kendi palette'i CVD-safe mi kontrol et</td>
+</tr>
+<tr>
+<td>Toprak Nemi</td>
+<td style="background: #27ae60; color: white;">■ Yeşil (#27ae60)</td>
+<td>✅ Nem = yeşil, mantıklı; luminosity net</td>
+<td>—</td>
+</tr>
+<tr>
+<td>NDVI</td>
+<td>Yeşil-Sarı gradient</td>
+<td>✅ Yeşil → sarı, luminosity artar, ayrıştırılabilir</td>
+<td>—</td>
+</tr>
+</table>
+</div>
+
+<div class="test-section">
+<h2>4️⃣ İlçeler Arası Hava Tablosu (Emojiler)</h2>
+<p>Sicak/soğuk vurgusunun renk-only'ye bağlı olmadığını kontrol:</p>
+<div class="legend-item">
+<div class="color-box" style="background: #f39c12;"></div>
+<span>Yüksek sıcaklık (25°C+) → ☀️ emoji + renk</span>
+</div>
+<div class="legend-item">
+<div class="color-box" style="background: #3498db;"></div>
+<span>Düşük sıcaklık (<15°C) → ❄️ emoji + renk</span>
+</div>
+<div class="note">
+✅ <strong>Bulgu:</strong> Emojiler renk + sembolik anlamı beraber veriyor. Colorblind kullanıcılar emoji + rakam (22°C) ile deşifreyi tamamlayabiliyor.
+</div>
+</div>
+
+<div class="test-section">
+<h2>📋 Genel Sonuç</h2>
+<ul>
+<li>✅ <strong>Tablo & Popup'lar:</strong> Renk + metin → tam deşifre (colorblind-safe)</li>
+<li>✅ <strong>Grid Tahmin:</strong> Luminosity gradyanı net (sekvans mor→kırmızı makul ama sarı-turuncu iyileştirilebilir)</li>
+<li>⚠️ <strong>Yağış Radaarı:</strong> Renk-only; pattern/hatch önerisi uygulanmadı (external tile, kontrol zor)</li>
+<li>✅ <strong>CBS Katmanları:</strong> Çoğu uyumlu; Corine kendi palette'i kontrol etmeli</li>
+<li>✅ <strong>Genel Tasarım:</strong> Renk + rakam + emoji kombinasyonu; renk eksikse deşifre yapılabilir</li>
+</ul>
+</div>
+
+<div class="test-section">
+<h2>🎯 Tavsiyeler (Sıralı Önem)</h2>
+<ol>
+<li><strong>Acil:</strong> Grid tahmin turuncu rengini canlı-sarı veya açık-camgöbeği ile değiştir (luminosity +10%)</li>
+<li><strong>Orta:</strong> Yağış radaarına bilgi tooltip ("Hafif/Orta/Şiddetli") ekle (renk + metin)</li>
+<li><strong>Uzun dönem:</strong> Radar tiles → MapTiler/Thunderforest (CVD-safe seçeneği) veya kendi üretime geç</li>
+<li><strong>Test:</strong> Coblis/Color Oracle simulatörüyle Protanopia/Deuteranopia modunda tüm sayfayı kontrol et</li>
+</ol>
+</div>
+
+</body>
+</html>

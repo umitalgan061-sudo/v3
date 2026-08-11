@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "tarimsal-cbs-static",
+      "runtimeExecutable": "C:/Users/umit.algan/AppData/Local/Python/bin/python.exe",
+      "runtimeArgs": ["-m", "http.server", "8743"],
+      "port": 8743
+    }
+  ]
+}

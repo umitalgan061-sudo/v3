@@ -1,0 +1,12 @@
+{
+  "appId": "tr.bel.ankara.tarimsalcbs",
+  "appName": "Tarımsal CBS",
+  "webDir": "www",
+  "server": {
+    "url": "https://cbs.ankara.bel.tr/tarimsalcbs/",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}

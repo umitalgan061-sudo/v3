@@ -1,0 +1,76 @@
+{
+  "name": "Tarımsal CBS",
+  "short_name": "Tarımsal CBS",
+  "description": "Ankara Büyükşehir Belediyesi tarımsal CBS platformu — katman yönetimi, ada/parsel sorgulama, hava analizi, uydu ve toprak haritaları. Çiftçi ve teknikerlerin saha çalışmalarında kullanmak üzere tasarlanmış.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#c0392b",
+  "background_color": "#07090f",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "logo.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "İlçe Seç",
+      "short_name": "İlçe",
+      "description": "Ankara ilçelerine hızlı erişim",
+      "url": "./index.html?view=ilce",
+      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Hava Durumu",
+      "short_name": "Hava",
+      "description": "Anlık hava durumu ve tahmin",
+      "url": "./index.html?view=hava",
+      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Parsel Sorgula",
+      "short_name": "Parsel",
+      "description": "Ada/parsel bilgisi sorgulama",
+      "url": "./index.html?view=parsel",
+      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+    }
+  ]
+}
