@@ -1,0 +1,136 @@
+name: One-time additive PWA logic fix
+
+on:
+  push:
+    branches:
+      - fix/pwa-scope-shortcuts
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/pwa-scope-shortcuts
+          fetch-depth: 0
+
+      - name: Apply additive-only PWA fixes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          if 'PWA_SCOPE_GUARD_V1' in text or 'PWA_SHORTCUT_ROUTER_V1' in text:
+              raise SystemExit('Guard/router marker already present; refusing duplicate insertion.')
+
+          cleanup_anchor = """if('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+          """
+          if text.count(cleanup_anchor) != 1:
+              raise SystemExit(f'Expected one cleanup anchor, found {text.count(cleanup_anchor)}')
+
+          scoped_guard = """if('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+              // PWA_SCOPE_GUARD_V1 — Tarımsal CBS yalnızca kendi service-worker scope'u
+              // ve kendi ad önekini taşıyan cache'leri temizlesin. Aynı origin altındaki
+              // başka uygulamaların kayıt/cache'lerine dokunulmaz.
+              const tarimsalAppScope = new URL('./', window.location.href).href;
+              navigator.serviceWorker.getRegistrations().then(regs => {
+                regs
+                  .filter(reg => reg.scope.startsWith(tarimsalAppScope))
+                  .forEach(reg => reg.unregister());
+              });
+              if(window.caches) {
+                caches.keys().then(names => names
+                  .filter(name => name.startsWith('tarimsal-cbs-'))
+                  .forEach(name => caches.delete(name)));
+              }
+              // No-delete kuralı gereği eski genel temizlik satırları aşağıda korunuyor;
+              // bu erken dönüş onları çalıştırmayarak yalnızca güvenli scoped temizliği uygular.
+              return;
+          """
+          text = text.replace(cleanup_anchor, scoped_guard, 1)
+
+          shortcut_anchor = "// ── ÇEVRİMDIŞI DESTEK KASITLI OLARAK KAPALI ─────────────────────────────\n"
+          if text.count(shortcut_anchor) != 1:
+              raise SystemExit(f'Expected one shortcut insertion anchor, found {text.count(shortcut_anchor)}')
+
+          shortcut_router = """// PWA_SHORTCUT_ROUTER_V1 — manifest.json içindeki ?view= kısayollarını
+          // mevcut arayüz kontrollerine bağlar; yeni panel/işlev oluşturmaz.
+          const pwaShortcutView = new URLSearchParams(window.location.search).get('view');
+          if(['ilce', 'hava', 'parsel'].includes(pwaShortcutView)) {
+            window.addEventListener('load', () => {
+              setTimeout(() => {
+                const ensureLeftDrawerVisible = () => {
+                  const left = document.getElementById('left');
+                  if(window.innerWidth <= 768 && left && !left.classList.contains('drawer-open')) {
+                    toggleDrawer('left');
+                  }
+                };
+
+                if(pwaShortcutView === 'ilce') {
+                  ensureLeftDrawerVisible();
+                  document.getElementById('ilce-select')?.focus();
+                  return;
+                }
+                if(pwaShortcutView === 'parsel') {
+                  ensureLeftDrawerVisible();
+                  document.getElementById('ap-ada')?.focus();
+                  return;
+                }
+
+                expandBottomPanel();
+                const hourlyTab = document.querySelector('#bottom .btab');
+                if(hourlyTab) showSaatlik(hourlyTab);
+              }, 0);
+            });
+          }
+
+          """
+          text = text.replace(shortcut_anchor, shortcut_router + shortcut_anchor, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Validate additive-only diff and manifests
+        shell: bash
+        run: |
+          git diff --check
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          text = Path('index.html').read_text(encoding='utf-8')
+          assert text.count('PWA_SCOPE_GUARD_V1') == 1
+          assert text.count('PWA_SHORTCUT_ROUTER_V1') == 1
+          assert "regs.forEach(reg => reg.unregister());" in text, 'Legacy line must remain under no-delete rule.'
+          assert "names.forEach(name => caches.delete(name))" in text, 'Legacy cache line must remain under no-delete rule.'
+          manifest = json.loads(Path('manifest.json').read_text(encoding='utf-8'))
+          assert manifest['start_url'] == './index.html'
+          urls = {item['url'] for item in manifest.get('shortcuts', [])}
+          assert './index.html?view=ilce' in urls
+          assert './index.html?view=hava' in urls
+          assert './index.html?view=parsel' in urls
+          PY
+          if git diff --unified=0 -- index.html | grep -E '^-[^-]' >/dev/null; then
+            echo 'ERROR: Existing index.html line deletion detected.'
+            git diff --unified=0 -- index.html
+            exit 1
+          fi
+
+      - name: Commit only the net index.html addition
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/one-time-pwa-additive-fix.yml
+          git add index.html
+          git diff --cached --check
+          git commit -m 'fix(pwa): scope cleanup and honor shortcuts [pwa-additive-fix]'
+          git push origin HEAD:fix/pwa-scope-shortcuts
