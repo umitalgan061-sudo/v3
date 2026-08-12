@@ -18,6 +18,17 @@ try {
   }
 } catch (_) {}
 
+// IPADOS_PWA_INSTALL_FALLBACK_V1 — iPadOS Safari varsayılan olarak masaüstü
+// user-agent kullanabildiği için index.html'deki iPad|iPhone|iPod testi kaçabilir.
+// Mevcut iOS akışını değiştirmeden yalnızca dokunmatik MacIntel/iPadOS durumunda
+// aynı yükleme rehberini sayfa tamamen yüklendikten sonra tetikle.
+const isIPadOSDesktopUA = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+if (isIPadOSDesktopUA) {
+  window.addEventListener('load', () => setTimeout(() => {
+    if (typeof showInstallBanner === 'function') showInstallBanner();
+  }, 2500));
+}
+
 let mapTilerRadarActive = false;
 let mapTilerRadarLayer = null;
 
