@@ -99,85 +99,8 @@ window.openMapTilerSettings = openMapTilerSettings;
 
 console.log('✅ MapTiler Weather API modülü yüklendi');
 
-// ── ADDITIVE WEATHER RUNTIME FIXES ──────────────────────────────────────────
-// Güncel MapTiler Weather API statik bir "precipitation-1h" tileset kimliği
-// sağlamıyor. Önce weather/latest.json kataloğundan yağış değişkeninin mevcut
-// keyframe kimliği bulunur, sonra bu UUID standart Tiles API ile Leaflet'e verilir.
-async function makeCurrentMapTilerRadarLayer() {
-  if (!MAPTILER_API_KEY || MAPTILER_API_KEY === 'DEMO_KEY_FOR_TESTING') {
-    throw new Error('Geçerli MapTiler API key gerekli');
-  }
-
-  const catalogResponse = await fetch(
-    `https://api.maptiler.com/weather/latest.json?key=${encodeURIComponent(MAPTILER_API_KEY)}`
-  );
-  if (!catalogResponse.ok) {
-    throw new Error(`MapTiler weather catalog HTTP ${catalogResponse.status}`);
-  }
-
-  const catalog = await catalogResponse.json();
-  const precipitation = (catalog.variables || []).find(variable => {
-    const weatherVariable = variable?.metadata?.weather_variable || {};
-    const haystack = `${weatherVariable.variable_id || ''} ${weatherVariable.name || ''}`.toLowerCase();
-    return haystack.includes('precip');
-  });
-  if (!precipitation?.keyframes?.length) {
-    throw new Error('MapTiler yağış keyframe verisi bulunamadı');
-  }
-
-  const now = Date.now();
-  const frame = precipitation.keyframes.reduce((best, candidate) => {
-    const candidateTime = Date.parse(candidate.timestamp);
-    const bestTime = Date.parse(best.timestamp);
-    return Math.abs(candidateTime - now) < Math.abs(bestTime - now) ? candidate : best;
-  });
-
-  return L.tileLayer(
-    `https://api.maptiler.com/tiles/${encodeURIComponent(frame.id)}/{z}/{x}/{y}?key=${encodeURIComponent(MAPTILER_API_KEY)}`,
-    {
-      attribution: precipitation?.metadata?.weather_variable?.attribution || 'MapTiler Weather',
-      maxZoom: 19,
-      opacity: 0.75,
-      crossOrigin: 'anonymous',
-      errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACw='
-    }
-  );
-}
-
-async function toggleCurrentMapTilerRadar() {
-  const tog = document.getElementById('tog-maptiler-radar');
-  if (!tog) return;
-
-  if (mapTilerRadarActive) {
-    if (mapTilerRadarLayer) map.removeLayer(mapTilerRadarLayer);
-    mapTilerRadarLayer = null;
-    mapTilerRadarActive = false;
-    tog.classList.remove('on');
-    return;
-  }
-
-  try {
-    tog.innerHTML = '<span style="font-size:9px;color:#fff">⏳</span>';
-    mapTilerRadarLayer = await makeCurrentMapTilerRadarLayer();
-    mapTilerRadarLayer.addTo(map);
-    mapTilerRadarActive = true;
-    tog.classList.add('on');
-    tog.innerHTML = '';
-    showToast('🌧️ MapTiler Weather yağış haritası yüklendi', 'tamam');
-  } catch (e) {
-    console.error('MapTiler hatası:', e);
-    showToast('MapTiler Weather yüklenemedi (API key / servis kontrol edin)', 'hata');
-    tog.classList.remove('on');
-    tog.innerHTML = '';
-  }
-}
-
-// Eski fonksiyonlar kaynakta korunur; yalnızca dışarı açılan çağrı güncel API
-// akışına yönlendirilir.
-window.toggleMapTilerRadar = toggleCurrentMapTilerRadar;
-
 // Hava karşılaştırmasındaki doğrulanmış ilçe-merkezi sapmalarını mevcut
-// ILCE_LOCS nesnesini silmeden, sayfa yüklenince yalnızca ilgili anahtarları düzelt.
+// ILCE_LOCS nesnesini veya eski değerleri silmeden, sayfa yüklenince düzelt.
 window.addEventListener('load', () => {
   if (typeof ILCE_LOCS !== 'undefined') {
     Object.assign(ILCE_LOCS, {
