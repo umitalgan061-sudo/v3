@@ -98,4 +98,20 @@ window.toggleMapTilerRadar = toggleMapTilerRadar;
 window.openMapTilerSettings = openMapTilerSettings;
 
 console.log('✅ MapTiler Weather API modülü yüklendi');
+
+// Hava karşılaştırmasındaki doğrulanmış ilçe-merkezi sapmalarını mevcut
+// ILCE_LOCS nesnesini veya eski değerleri silmeden, sayfa yüklenince düzelt.
+window.addEventListener('load', () => {
+  if (typeof ILCE_LOCS !== 'undefined') {
+    Object.assign(ILCE_LOCS, {
+      'Mamak': [39.93175, 32.91087],
+      'Ayaş': [40.01942, 32.33220],
+      'Evren': [39.02023, 33.80579],
+      'Polatlı': [39.58333, 32.13333],
+      'Haymana': [39.43414, 32.49879],
+      'Nallıhan': [40.18887, 31.35061],
+      'Çamlıdere': [40.49162, 32.47653]
+    });
+  }
+});
 }
