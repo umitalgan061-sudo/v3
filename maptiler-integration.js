@@ -9,6 +9,15 @@
 if (!window.__tarimsalMapTilerIntegrationLoaded) {
   window.__tarimsalMapTilerIntegrationLoaded = true;
 
+// NATIVE_PWA_INSTALL_GUARD_V1 — native Capacitor kabında uygulama zaten kurulu;
+// web/PWA tarafındaki "Uygulamayı Yükle / Ana Ekrana Ekle" banner'ı gösterilmesin.
+// Mevcut install akışını değiştirmeden onun kullandığı dismissal anahtarını işaretle.
+try {
+  if (window.Capacitor?.isNativePlatform?.() === true) {
+    localStorage.setItem('abb_tarim_install_dismissed', 'native-container');
+  }
+} catch (_) {}
+
 let mapTilerRadarActive = false;
 let mapTilerRadarLayer = null;
 
