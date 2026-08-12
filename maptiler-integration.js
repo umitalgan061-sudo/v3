@@ -29,6 +29,28 @@ if (isIPadOSDesktopUA) {
   }, 2500));
 }
 
+// IPADOS_PWA_INSTALL_ACTION_FIX_V1 — yukarıdaki fallback banner'ı görünür kılsa
+// bile index.html içindeki isIOSDevice masaüstü-UA iPadOS'ta false kalır. Bu yüzden
+// butonun Android/Chrome beforeinstallprompt yoluna gitmesini engelleyip mevcut
+// iOS "Ana Ekrana Ekle" rehberine yönlendir; masaüstü ve diğer mobil akışlara dokunma.
+if (isIPadOSDesktopUA) {
+  window.addEventListener('load', () => setTimeout(() => {
+    if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) return;
+    if (localStorage.getItem('abb_tarim_install_dismissed')) return;
+    const sub = document.getElementById('install-banner-sub');
+    const go = document.getElementById('install-banner-go');
+    if (sub) sub.textContent = 'Paylaş simgesine dokunup "Ana Ekrana Ekle"yi seçin';
+    if (go) {
+      go.textContent = 'Nasıl?';
+      go.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (typeof showIOSInstallGuide === 'function') showIOSInstallGuide();
+      }, true);
+    }
+  }, 2500));
+}
+
 let mapTilerRadarActive = false;
 let mapTilerRadarLayer = null;
 
