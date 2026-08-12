@@ -112,6 +112,23 @@ window.addEventListener('load', () => {
       'Nallıhan': [40.18887, 31.35061],
       'Çamlıdere': [40.49162, 32.47653]
     });
+    // Ankara'nın resmi 25-ilçe listesinde olup karşılaştırma tablosunda eksik
+    // kalan ilçeleri ekle. Mevcut ILCE_LOCS tanımı ve eski değerler korunur.
+    Object.assign(ILCE_LOCS, {
+      'Akyurt': [40.13075, 33.08707],
+      'Elmadağ': [39.92213, 33.22627],
+      'Etimesgut': [39.94894, 32.66208],
+      'Güdül': [40.21051, 32.24552]
+    });
+
+    // Keskin Ankara ilçesi değildir; Keceli ve Hasanoğlan da ilçe değildir.
+    // Kaynak değerleri silmeden Object.entries(ILCE_LOCS) karşılaştırma listesinden
+    // çıkar: özellikler doğrudan erişimde kalır, yalnızca enumerable olmaz.
+    ['Keskin', 'Keceli', 'Hasanoğlan'].forEach(name => {
+      if (Object.prototype.hasOwnProperty.call(ILCE_LOCS, name)) {
+        Object.defineProperty(ILCE_LOCS, name, { enumerable: false });
+      }
+    });
   }
 });
 }
