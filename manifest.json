@@ -38,6 +38,12 @@
   "screenshots": [
     {
       "src": "logo.png",
+      "sizes": "175x293",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "logo.png",
       "sizes": "540x720",
       "type": "image/png",
       "form_factor": "narrow"
